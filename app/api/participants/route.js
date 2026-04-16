@@ -42,3 +42,25 @@ export async function DELETE(request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+export async function PUT(request) {
+  try {
+    const { id, country, artist, song } = await request.json();
+    if (!id) {
+      return NextResponse.json({ error: 'Missing participant id' }, { status: 400 });
+    }
+
+    const participant = db.prepare('SELECT * FROM participants WHERE id = ?').get(id);
+    if (!participant) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    db.prepare('UPDATE participants SET country = ?, artist = ?, song = ? WHERE id = ?')
+      .run(country, artist, song, id);
+
+    const updated = db.prepare('SELECT * FROM participants WHERE id = ?').get(id);
+    return NextResponse.json(updated);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

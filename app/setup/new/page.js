@@ -6,6 +6,7 @@ export default function NewScoreboard() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [pointSystem, setPointSystem] = useState('standard');
+  const [voteMode, setVoteMode] = useState('manual');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -14,7 +15,7 @@ export default function NewScoreboard() {
     const res = await fetch('/api/scoreboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, pointSystem })
+      body: JSON.stringify({ name, pointSystem, voteMode })
     });
     if (res.ok) {
       const data = await res.json();
@@ -39,6 +40,13 @@ export default function NewScoreboard() {
             <select value={pointSystem} onChange={e => setPointSystem(e.target.value)}>
               <option value="standard">Standard ESC (1,2,3,4,5,6,7,8,10,12)</option>
               <option value="extended">ESC Extended (1,2,3,4,5,6,8,10,12,14,17,20)</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Voting Mode</label>
+            <select value={voteMode} onChange={e => setVoteMode(e.target.value)}>
+              <option value="manual">Manual Juries (insert juries in setup, then Set Vote)</option>
+              <option value="global">Global Voting Link (juror identifies themselves on vote page)</option>
             </select>
           </div>
           <button className="btn" type="submit" disabled={loading} style={{ width: '100%' }}>

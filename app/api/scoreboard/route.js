@@ -8,13 +8,14 @@ export async function POST(request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const { name, pointSystem } = await request.json();
+    const { name, pointSystem, voteMode } = await request.json();
+    const normalizedVoteMode = voteMode === 'global' ? 'global' : 'manual';
     const id = crypto.randomUUID();
     
-    db.prepare('INSERT INTO scoreboards (id, user_id, name, point_system) VALUES (?, ?, ?, ?)')
-      .run(id, session.userId, name, pointSystem);
+    db.prepare('INSERT INTO scoreboards (id, user_id, name, point_system, vote_mode) VALUES (?, ?, ?, ?, ?)')
+      .run(id, session.userId, name, pointSystem, normalizedVoteMode);
       
-    return NextResponse.json({ id, name, point_system: pointSystem, user_id: session.userId });
+    return NextResponse.json({ id, name, point_system: pointSystem, vote_mode: normalizedVoteMode, user_id: session.userId });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
